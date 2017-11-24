@@ -16,4 +16,7 @@ The website was developed using [Python](https://www.python.org/) version [3.6.3
 ```
 gunzip Python-3.6.3.tgz
 tar -xvf Python-3.6.3.tar
+cd Python-3.6.3
+./configure --prefix=${VIRTUAL_ENV}
+make altinstall
 ```
