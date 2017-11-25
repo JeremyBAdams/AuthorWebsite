@@ -1,6 +1,7 @@
 # SETUP
 
-This file contains the commands that were issued to install dependencies on the web server
+This file contains instructions on how to configure django and associated dependencies for author-website web application.
+NOTE: this is for a local MacOSX machine (corresponds to dev branch in github)
 
 ### Linux libraries
 
