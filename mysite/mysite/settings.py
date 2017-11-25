@@ -24,7 +24,6 @@ SECRET_KEY = 't&ay4m0tawpf!ejtj^jh_b*3e8ygd3$#$j8(_x#p8tx)t&t51z'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -37,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'home',
 ]
 
 MIDDLEWARE = [
@@ -75,9 +75,12 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        'USER': 'jeremybadams'
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': "author_website_db",
+        'USER': 'author_website_db_user',
+        "PASSWORD": "mypassword",
+        "HOST": "localhost",
+        "PORT": "",
     }
 }
 

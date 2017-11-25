@@ -2,14 +2,61 @@
 
 This file contains the commands that were issued to install dependencies on the web server
 
+### Linux libraries
+
+-installed libraries via the commands:
+```
+sudo yum install postgresql
+sudo yum install postgresql-contrib
+sudo yum install postgresql-server
+sudo yum install libpq-dev
+```
+
 ### PostgreSQL
 
+-to initialize db after installing above dependencies
+```
+sudo service postgres initdb
+sudo service postgres start
+```
+
+-to adjust database, become postgres user, and enter psql terminal:
+```
+sudo -su postgres
+psql
+```
+
+-create database and change postgres user password
+```
+create database author_website_db;
+create user author_website_db_user with password 'mypassword';
+alter role author_website_db_user set client_encoding to 'utf8';
+alter role author_website_db_user set default_transaction_isolation to 'read committed';
+alter role author_website_db_user set timezone to 'UTC';
+grant all privileges on database author_website_db to author_website_db_user;
+```
+
+-adjust pg_hba.conf file to allow md5 logins (passwords)
+```
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+local   all             all                                     md5
+host    all             all             127.0.0.1/32            md5
+host    all             all             ::1/128                 md5
+```
+
+-restart postgresql
+```
+sudo /etc/init.d/postgresql restart
+```
 
 ### Python
 
 ##### python installation
 
-The website was developed using [Python](https://www.python.org/) version [3.6.3](https://www.python.org/downloads/release/python-363/). Gzipped tarball source was copied to the PYTHON_DIR directory, then unpacked and installed via the following commands:
+Version: Python [3.6.3](https://www.python.org/downloads/release/python-363/) - Gzipped tarball
+
+-tarball was downloaded to machine and moved to python directory
+-tarball was installed via the commands
 ```
 PYTHON_DIR=${HOME_DIRECTORY/my-software/python}
 gunzip Python-3.6.3.tgz
@@ -30,7 +77,7 @@ The website achieves python package dependency virtualization via [virtualenv](h
 ```
 VIRTUAL_ENV=${HOME_DIRECTORY}/my-software/python-virtual-envs/author-website
 mkdir ${VIRTUAL_ENV}
-pip install --install-option="--prefix=${PYTHON_DIR}" virtualenv
+pip install virtualenv
 virtualenv ${VIRTUAL_ENV}
 ```
 
@@ -49,5 +96,5 @@ With the author-website virtual environment activated, python dependencies can b
 2. the install commands below
 ```
 pip install django
-pip install mysqlclient
+pip install psycopg2
 ```
