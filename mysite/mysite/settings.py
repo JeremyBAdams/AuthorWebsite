@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 import re
 
+#webapp environment variables
+webapp_env_config_file = "webapp_env.conf"
+webapp_env_D = {line.split("=")[0] : line.rstrip().split("=")[1] for line in open(webapp_env_config_file , "r").readlines() if re.compile("=").search(line)}
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -21,11 +25,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 't&ay4m0tawpf!ejtj^jh_b*3e8ygd3$#$j8(_x#p8tx)t&t51z'
+SECRET_KEY = webapp_env_D['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-ALLOWED_HOSTS = []
+DEBUG = bool(int(webapp_env_D['DEBUG']))
+ALLOWED_HOSTS = webapp_env_D['ALLOWED_HOSTS'].split(',')
 
 
 # Application definition
@@ -75,16 +79,15 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-webapp_env_config_file = "webapp_env.conf"
-webapp_env_D = {line.split("=")[0] : line.rstrip().split("=")[1] for line in open(webapp_env_config_file , "r").readlines() if re.compile("=").search(line)}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': "author_website_db",
-        'USER': 'author_website_db_user',
-        "PASSWORD": "mypassword",
-        "HOST": "localhost",
-        "PORT": webapp_env_D["PORT"],
+        'NAME': webapp_env_D['NAME'],
+        'USER': webapp_env_D['USER'],
+        'PASSWORD': webapp_env_D['PASSWORD'],
+        'HOST': webapp_env_D['HOST'],
+        'PORT': webapp_env_D['PORT'],
     }
 }
 
