@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+import re
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'home',
+    'articles',
+    'blog',
 ]
 
 MIDDLEWARE = [
@@ -72,7 +75,8 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
+webapp_env_config_file = "webapp_env.conf"
+webapp_env_D = {line.split("=")[0] : line.rstrip().split("=")[1] for line in open(webapp_env_config_file , "r").readlines() if re.compile("=").search(line)}
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -80,7 +84,7 @@ DATABASES = {
         'USER': 'author_website_db_user',
         "PASSWORD": "mypassword",
         "HOST": "localhost",
-        "PORT": "",
+        "PORT": webapp_env_D["PORT"],
     }
 }
 
@@ -109,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Canada/Eastern'
 
 USE_I18N = True
 
