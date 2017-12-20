@@ -13,9 +13,16 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 import re
 
-#webapp environment variables
-webapp_env_config_file = "webapp_env.conf"
-webapp_env_D = {line.split("=")[0] : line.rstrip().split("=")[1] for line in open(webapp_env_config_file , "r").readlines() if re.compile("=").search(line)}
+#master config pointer file gives path to the master config, which contains all
+#environment variables for entire application
+master_conf_pointer_f = "master-conf-pointer.txt"
+master_conf_f = open(master_conf_pointer_f).read().rstrip()
+master_conf_D = {
+    line.split("=")[0] : line.rstrip().split("=")[1]
+    for line in open(master_conf_f , "r").readlines()
+    if re.compile("=").search(line)
+}
+#webapp_env_D = {line.split("=")[0] : line.rstrip().split("=")[1] for line in open(webapp_env_config_file , "r").readlines() if re.compile("=").search(line)}
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,11 +32,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = webapp_env_D['SECRET_KEY']
+SECRET_KEY = master_conf_D['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(int(webapp_env_D['DEBUG']))
-ALLOWED_HOSTS = webapp_env_D['ALLOWED_HOSTS'].split(',')
+DEBUG = bool(int(master_conf_D['DEBUG']))
+ALLOWED_HOSTS = master_conf_D['ALLOWED_HOSTS'].split(',')
 
 
 # Application definition
@@ -83,11 +90,11 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': webapp_env_D['NAME'],
-        'USER': webapp_env_D['USER'],
-        'PASSWORD': webapp_env_D['PASSWORD'],
-        'HOST': webapp_env_D['HOST'],
-        'PORT': webapp_env_D['PORT'],
+        'NAME': master_conf_D['NAME'],
+        'USER': master_conf_D['USER'],
+        'PASSWORD': master_conf_D['PASSWORD'],
+        'HOST': master_conf_D['HOST'],
+        'PORT': master_conf_D['PORT'],
     }
 }
 
@@ -127,6 +134,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
-STATICFILES_DIRS = webapp_env_D['STATICFILES_DIRS'].split(',')
-STATIC_ROOT = webapp_env_D['STATIC_ROOT']
+STATICFILES_DIRS = master_conf_D['STATICFILES_DIRS'].split(',')
+STATIC_ROOT = master_conf_D['STATIC_ROOT']
 STATIC_URL = '/static/'
