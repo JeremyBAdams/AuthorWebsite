@@ -6,8 +6,8 @@ from applib.archetype import Archetype
 class ArticleResponseBuilder(ResponseBuilder):
 
     def __init__(self,request):
+        ResponseBuilder.__init__(self)
         self.article_css_dir = self.get_article_css_dir()
-        self.archetype = Archetype()
 
     def get_article_css_dir(self):
         static_url = get_static_url()
@@ -27,17 +27,22 @@ class ArticleResponseBuilder(ResponseBuilder):
 
     def get_index_response(self):
         cssfile = self.get_archetype_css_file(self.archetype.WARDEN)
+        html_header = self.get_header_html_string()
+        html_footer = self.get_footer_html_string()
+
         response_string = """<!DOCTYPE HTML>
     <head>
     <link rel="stylesheet" type ="text/css" href="%s">
     </head>
     <body>
         <div class="my_div">
+        %s
         Index page for articles app<br>
         Welcome Friendo<br><br>
+        %s
         </div>
     </body>
-    """ % (cssfile)
+    """ % (cssfile ,html_header , html_footer)
 
         return HttpResponse(response_string)
 
