@@ -31,9 +31,11 @@ class HomeResponseBuilder(ResponseBuilder):
         header = self.get_raw_header_html(self.client_tracker.PC)
         footer = self.get_raw_footer_html(self.client_tracker.PC)
 
-        body_test_angular = """Write some text in this text booox:
+        body_test_angular = """<div>
+        Write some text in this text booox:
         <input type="text" ng-model="sometext" />
         <h1>Hello {{sometext}}</h1>
+</div>
 """
         final_html = skeleton
         implementation_L = [
