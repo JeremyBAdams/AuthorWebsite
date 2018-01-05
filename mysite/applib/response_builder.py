@@ -3,7 +3,8 @@ from applib.client_tracker import ClientTracker
 from applib.website_methods import *
 
 class ResponseBuilder:
-    def __init__(self):
+    def __init__(self,request):
+        self.request = request
         self.archetype = Archetype()
         self.client_tracker = ClientTracker()
 
@@ -36,6 +37,33 @@ class ResponseBuilder:
         return self.get_staticroot_global_js_dir()+"/angular.js"
     def get_staticroot_angular_js_min(self):
         return self.get_staticroot_global_js_dir()+"/angular.min.js"
+
+    def get_staticroot_global_css(self,device):
+        path = self.get_staticroot_global_css_dir()
+        if device == self.client_tracker.MOBILE:
+            path += "/global.mobile.css"
+        else:
+            path += "/global.css"
+        raw_css = open(path,"r").read()
+        return raw_css
+
+    def get_staticroot_wsheader_css(self,device):
+        path = self.get_staticroot_global_css_dir()
+        if device == self.client_tracker.MOBILE:
+            path += "/ws_header.mobile.css"
+        else:
+            path += "/ws_header.css"
+        raw_css = open(path,"r").read()
+        return raw_css
+
+    def get_staticroot_wsfooter_css(self,device):
+        path = self.get_staticroot_global_css_dir()
+        if device == self.client_tracker.MOBILE:
+            path += "/ws_footer.mobile.css"
+        else:
+            path += "/ws_footer.css"
+        raw_css = open(path,"r").read()
+        return raw_css
 
     def get_raw_skeleton_html(self,device):
         path = self.get_staticroot_global_html_dir()

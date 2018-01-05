@@ -9,9 +9,14 @@ class Pseudonym(models.Model):
 
     #all articles must be written by a pseudo author (via foreignkey constraint)
     pseudonym = models.CharField(
+        primary_key = True,
+        unique = True,
         max_length=250,
-        unique=True
     )
+
+    def __str__(self):
+        """docstring"""
+        return "Pseudonym instance - " + self.pseudonym
 
 class Series(models.Model):
     """class for the serialization group that an article falls under"""
@@ -19,9 +24,14 @@ class Series(models.Model):
     #all articles fall into a series (eg. Astran History, or Character Bios)
     #articles will be forced into a series via foreignkey constraint)
     series_name = models.CharField(
-        max_length=250,
-        unique=True
+        primary_key = True,
+        unique=True,
+        max_length=250
     )
+
+    def __str__(self):
+        """docstring"""
+        return "Series instance - " + self.series_name
 
 class Palette(models.Model):
     """class for webpage color palette based on the novel's concept of soul archetypes"""
@@ -31,19 +41,14 @@ class Palette(models.Model):
 
     #color palette archetype name
     archetype_name = models.CharField(
-        max_length=20,
-        unique=True
+        primary_key = True,
+        unique=True,
+        max_length=20
     )
-    #hex code of the main color
-    main_color = models.CharField(
-        validators=[MinLengthValidator(7)],
-        max_length=7
-    )
-    #hex code of the accent color
-    accent_color = models.CharField(
-        validators=[MinLengthValidator(7)],
-        max_length=7
-    )
+
+    def __str__(self):
+        """docstring"""
+        return "Palette instance - " + self.archetype_name
 
 class Article(models.Model):
     """class for story-based articles"""
@@ -54,10 +59,17 @@ class Article(models.Model):
         max_length=500,
         unique=True
     )
+
+    url_string = models.CharField(
+        max_length=500,
+        unique=True
+    )
+
     #reference_number: a 6-digit reference id number
     #ie '123456', to be used for file pathing
     #html pages and images will be named based on reference id number
     reference_number = models.CharField(
+        primary_key=True,
         validators=[MinLengthValidator(6)],
         max_length=6,
         unique=True
