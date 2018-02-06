@@ -12,4 +12,6 @@ def index(request):
 
 
 def article(request):
-    pass
+    arb = ArticleResponseBuilder(request)
+    response = arb.get_article_response()
+    return response

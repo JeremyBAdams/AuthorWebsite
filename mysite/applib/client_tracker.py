@@ -1,7 +1,9 @@
 class ClientTracker:
 
     def __init__(self):
-        pass
+        self.PC = 0
+        self.TABLET = 1
+        self.MOBILE = 2
 
     def get_client_device(self,request):
         D = {
