@@ -15,8 +15,14 @@ class ArticleResponseBuilder(ResponseBuilder):
         html_dir = static_root+"/frontend/apps/articles/html"
         return html_dir
 
-    def get_staticroot_article_html(self):
-        html = self.get_staticroot_article_html_dir()+"/article_body.html"
+    def get_staticroot_article_index_html(self):
+        path = self.get_staticroot_article_html_dir()+"/article_index.html"
+        html = open(path,"r").read()
+        return html
+
+    def get_staticroot_article_response_html(self):
+        path = self.get_staticroot_article_html_dir()+"/article_response.html"
+        html = open(path,"r").read()
         return html
 
     def get_staticroot_article_css_dir(self):
@@ -26,6 +32,11 @@ class ArticleResponseBuilder(ResponseBuilder):
 
     def get_staticroot_article_general_css(self,device):
         cssfile = self.get_staticroot_article_css_dir()+"/general.css"
+        raw_css = open(cssfile,"r").read()
+        return raw_css
+
+    def get_staticroot_article_index_css(self,device):
+        cssfile = self.get_staticroot_article_css_dir()+"/index.css"
         raw_css = open(cssfile,"r").read()
         return raw_css
 
@@ -47,28 +58,31 @@ class ArticleResponseBuilder(ResponseBuilder):
         skeleton_html = self.get_raw_skeleton_html(self.client_tracker.PC)
         header_html = self.get_raw_header_html(self.client_tracker.PC)
         footer_html = self.get_raw_footer_html(self.client_tracker.PC)
+        index_html = self.get_staticroot_article_index_html()
 
         global_css = self.get_staticroot_global_css(self.client_tracker.PC)
         header_css = self.get_staticroot_wsheader_css(self.client_tracker.PC)
         footer_css = self.get_staticroot_wsfooter_css(self.client_tracker.PC)
+        index_css = self.get_staticroot_article_index_css(self.client_tracker.PC)
 
         archetype_int = self.archetype.WARDEN
         archetype_css = self.get_staticroot_article_archetype_css(
             archetype_int
         )
         all_css = "\n".join([
-            global_css,header_css,footer_css,archetype_css
+            global_css,header_css,footer_css,archetype_css, index_css
         ])
 
         final_html = skeleton_html
-        body_test = "Welcome to the articles index"
+
+        article_index_body = self.get_staticroot_article_index_html()
 
         implementation_L = [
             ["AWVAR_TITLE","The Blood of the World"],
             ["AWVAR_CSS",all_css],
             ["AWVAR_ANGULARJS",self.get_staticurl_angular_js_min()],
             ["AWVAR_HTML_HEADER",header_html],
-            ["AWVAR_HTML_BODY",body_test],
+            ["AWVAR_HTML_BODY",article_index_body],
             ["AWVAR_HTML_FOOTER",footer_html]
         ]
         for imp in implementation_L:
@@ -107,10 +121,7 @@ class ArticleResponseBuilder(ResponseBuilder):
             article_html_body = re.compile("<body>(.+?)</body>",re.DOTALL).\
                 search(article_html).group(1)
 
-            article_template = open(
-                self.get_staticroot_article_html(),
-                "r"
-            ).read()
+            article_template = self.get_staticroot_article_response_html()
 
             mature_article_html = article_template.replace(
                 "ARTICLE_VAR_CONTENT",
