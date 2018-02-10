@@ -2,59 +2,51 @@ from django.http import HttpResponse
 from applib.website_methods import *
 from applib.response_builder import ResponseBuilder
 from applib.archetype import Archetype
+from applib.author_website_keys import AuthorWebsiteKeys as awk
 
 class HomeResponseBuilder(ResponseBuilder):
 
     def __init__(self,request):
         ResponseBuilder.__init__(self,request)
 
-    def get_staticroot_home_archetype_css_dir(self):
-        static_root = get_static_root()
-        css_dir = static_root+"/frontend/apps/home/css"
-        return css_dir
+    def get_mature_index_css(self):
+        home_index_css_path = self.get_page_path(
+            app=awk.HOME, filetype=awk.CSS, page="home_index"
+        )
+        home_index_css = self.get_file_contents(home_index_css_path)
 
-    def get_staticroot_home_archetype_css(self,archetype_index):
-        cssfiles_L = [
-            "warden.css",
-            "rebel.css",
-            "champion.css",
-            "architect.css",
-            "conqueror.css",
-            "exile.css"
-        ]
-        cssfile = self.get_staticroot_home_archetype_css_dir()+"/" \
-                  + cssfiles_L[archetype_index]
-        raw_css = open(cssfile,"r").read()
-        return raw_css
+        return home_index_css
+
+    def get_mature_index_html(self):
+        home_index_html_path = self.get_page_path(
+            app=awk.HOME, page="home_index"
+        )
+        home_index_html = self.get_file_contents(home_index_html_path)
+
+        return home_index_html
 
     def get_index_response(self):
-        skeleton_html = self.get_raw_skeleton_html(self.client_tracker.PC)
-        header_html = self.get_raw_header_html(self.client_tracker.PC)
-        footer_html = self.get_raw_footer_html(self.client_tracker.PC)
+        title = "The Blood of the World"
 
-        global_css = self.get_staticroot_global_css(self.client_tracker.PC)
-        header_css = self.get_staticroot_wsheader_css(self.client_tracker.PC)
-        footer_css = self.get_staticroot_wsfooter_css(self.client_tracker.PC)
-
-        archetype_int = get_random_archetype_integer()
-        archetype_css = self.get_staticroot_home_archetype_css(
-            archetype_int
+        global_css_path = self.get_page_path(filetype=awk.CSS, page="global")
+        header_css_path = self.get_page_path(filetype=awk.CSS, page="ws_header")
+        footer_css_path = self.get_page_path(filetype=awk.CSS, page="ws_footer")
+        archetype_css_path = self.get_page_path(
+            app=awk.HOME, filetype=awk.CSS, page="warden"
         )
-        all_css = "\n".join([
-            global_css,header_css,footer_css,archetype_css
-        ])+"\n"
+        mature_home_index_css = self.get_mature_index_css()
 
-        body_test_angular = ""
-        final_html = skeleton_html
-        implementation_L = [
-            ["AWVAR_TITLE","The Blood of the World"],
-            ["AWVAR_CSS",all_css],
-            ["AWVAR_ANGULARJS",self.get_staticurl_angular_js_min()],
-            ["AWVAR_HTML_HEADER",header_html],
-            ["AWVAR_HTML_BODY",body_test_angular],
-            ["AWVAR_HTML_FOOTER",footer_html]
-        ]
-        for imp in implementation_L:
-            final_html = self.implement_html(final_html,imp[0],imp[1])
+        all_css_L = self.get_file_contents_for_list(
+            file_list=[global_css_path,header_css_path,footer_css_path,
+                       archetype_css_path]
+        )
+        all_css_L.append(mature_home_index_css)
 
-        return HttpResponse(final_html)
+        mature_home_index_html = self.get_mature_index_html()
+        all_body_html_L = [mature_home_index_html]
+
+        implemented_html = self.stitch_and_get_page(
+            title=title, all_css_L=all_css_L, all_body_html_L=all_body_html_L
+        )
+
+        return HttpResponse(implemented_html)

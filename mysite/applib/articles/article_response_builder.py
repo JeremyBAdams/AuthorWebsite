@@ -1,155 +1,129 @@
 import os
 import re
+from articles.models import Article, Pseudonym, Series
 from django.http import HttpResponse
 from applib.website_methods import *
 from applib.response_builder import ResponseBuilder
 from applib.archetype import Archetype
+from applib.author_website_keys import AuthorWebsiteKeys as awk
+
 
 class ArticleResponseBuilder(ResponseBuilder):
 
     def __init__(self,request):
         ResponseBuilder.__init__(self,request)
 
-    def get_staticroot_article_html_dir(self):
-        static_root = get_static_root()
-        html_dir = static_root+"/frontend/apps/articles/html"
-        return html_dir
-
-    def get_staticroot_article_index_html(self):
-        path = self.get_staticroot_article_html_dir()+"/article_index.html"
-        html = open(path,"r").read()
-        return html
-
-    def get_staticroot_article_response_html(self):
-        path = self.get_staticroot_article_html_dir()+"/article_response.html"
-        html = open(path,"r").read()
-        return html
-
-    def get_staticroot_article_css_dir(self):
-        static_root = get_static_root()
-        css_dir = static_root+"/frontend/apps/articles/css"
-        return css_dir
-
-    def get_staticroot_article_general_css(self,device):
-        cssfile = self.get_staticroot_article_css_dir()+"/general.css"
-        raw_css = open(cssfile,"r").read()
-        return raw_css
-
-    def get_staticroot_article_index_css(self,device):
-        cssfile = self.get_staticroot_article_css_dir()+"/index.css"
-        raw_css = open(cssfile,"r").read()
-        return raw_css
-
-    def get_staticroot_article_archetype_css(self,archetype_index):
-        cssfiles_L = [
-            "warden.css",
-            "rebel.css",
-            "champion.css",
-            "architect.css",
-            "conqueror.css",
-            "exile.css"
-        ]
-        cssfile = self.get_staticroot_article_css_dir()+"/" \
-                  + cssfiles_L[archetype_index]
-        raw_css = open(cssfile,"r").read()
-        return raw_css
-
     def get_index_response(self):
-        skeleton_html = self.get_raw_skeleton_html(self.client_tracker.PC)
-        header_html = self.get_raw_header_html(self.client_tracker.PC)
-        footer_html = self.get_raw_footer_html(self.client_tracker.PC)
-        index_html = self.get_staticroot_article_index_html()
+        title = "Stories of Blessed Astra"
 
-        global_css = self.get_staticroot_global_css(self.client_tracker.PC)
-        header_css = self.get_staticroot_wsheader_css(self.client_tracker.PC)
-        footer_css = self.get_staticroot_wsfooter_css(self.client_tracker.PC)
-        index_css = self.get_staticroot_article_index_css(self.client_tracker.PC)
-
-        archetype_int = self.archetype.WARDEN
-        archetype_css = self.get_staticroot_article_archetype_css(
-            archetype_int
+        global_css_path = self.get_page_path(filetype=awk.CSS, page="global")
+        header_css_path = self.get_page_path(filetype=awk.CSS, page="ws_header")
+        footer_css_path = self.get_page_path(filetype=awk.CSS, page="ws_footer")
+        index_css_path = self.get_page_path(
+            app=awk.ARTICLES, filetype=awk.CSS, page="index"
         )
-        all_css = "\n".join([
-            global_css,header_css,footer_css,archetype_css, index_css
-        ])
+        archetype_css_path = self.get_page_path(
+            app=awk.ARTICLES, filetype=awk.CSS, page="warden")
+        all_css_L = self.get_file_contents_for_list(
+            [global_css_path, header_css_path, footer_css_path,
+            index_css_path, archetype_css_path]
+        )
 
-        final_html = skeleton_html
+        index_html_path = self.get_page_path(
+            app=awk.ARTICLES, page="article_index"
+        )
+        all_body_html_L = self.get_file_contents_for_list(
+            file_list=[index_html_path]
+        )
 
-        article_index_body = self.get_staticroot_article_index_html()
+        implemented_html = self.stitch_and_get_page(
+            title=title, all_css_L=all_css_L, all_body_html_L=all_body_html_L
+        )
 
-        implementation_L = [
-            ["AWVAR_TITLE","The Blood of the World"],
-            ["AWVAR_CSS",all_css],
-            ["AWVAR_ANGULARJS",self.get_staticurl_angular_js_min()],
-            ["AWVAR_HTML_HEADER",header_html],
-            ["AWVAR_HTML_BODY",article_index_body],
-            ["AWVAR_HTML_FOOTER",footer_html]
-        ]
-        for imp in implementation_L:
-            final_html = self.implement_html(final_html,imp[0],imp[1])
+        return HttpResponse(implemented_html)
 
-        return HttpResponse(final_html)
+    def get_mature_article_css(self, url_string=None, article_obj=None):
+        article_response_css_path = self.get_page_path(
+            app=awk.ARTICLES, filetype=awk.CSS, page="response"
+        )
+        article_response_css = self.get_file_contents(
+            article_response_css_path
+        )
+        article_bg_image_path = self.get_page_path(
+            app=awk.ARTICLES, filetype = awk.JPG, path_or_url=awk.STATICURL,
+            page=url_string, frontend_or_content=awk.CONTENT
+        )
+        mature_response_css = article_response_css\
+            .replace("ARTICLE_VAR_BG_IMAGE",article_bg_image_path)
+
+        return mature_response_css
+
+    def get_mature_article_html(self, url_string=None, article_obj=None):
+        title = article_obj.title
+        date = article_obj.pub_date
+        formatted_date = date.strftime("%B %d, %Y")
+
+        pseudonym_obj = Pseudonym.objects.get(pseudonym_id=article_obj.pseudonym_id)
+        pseudonym = pseudonym_obj.pseudonym
+
+        series_obj = Series.objects.get(series_id=article_obj.series_id)
+        series_name = series_obj.series_name
+
+        article_skeleton_path = self.get_page_path(
+            app=awk.ARTICLES, page="article_response"
+        )
+        article_skeleton_html = self.get_file_contents(
+            path=article_skeleton_path
+        )
+
+        article_content_path = self.get_page_path(
+            app=awk.ARTICLES, frontend_or_content=awk.CONTENT,
+            page=url_string
+        )
+        article_content_html = self.get_file_contents(
+            path=article_content_path
+        )
+
+        mature_article_html = article_skeleton_html\
+            .replace("ARTICLE_TITLE",title)\
+            .replace("ARTICLE_PSEUDONYM",pseudonym)\
+            .replace("ARTICLE_SERIES",series_name)\
+            .replace("ARTICLE_CONTENT",article_content_html)\
+            .replace("ARTICLE_DATE",formatted_date)
+
+        return mature_article_html
 
     def get_article_response(self):
-        skeleton_html = self.get_raw_skeleton_html(self.client_tracker.PC)
-        header_html = self.get_raw_header_html(self.client_tracker.PC)
-        footer_html = self.get_raw_footer_html(self.client_tracker.PC)
+        url_string = self.request.path.split("/")[-1]
+        article_obj = Article.objects.get(url_string=url_string)
 
-        global_css = self.get_staticroot_global_css(self.client_tracker.PC)
-        article_css = self.get_staticroot_article_general_css(self.client_tracker.PC)
-        header_css = self.get_staticroot_wsheader_css(self.client_tracker.PC)
-        footer_css = self.get_staticroot_wsfooter_css(self.client_tracker.PC)
+        if article_obj:
+            title = article_obj.title
 
-        archetype_int = self.archetype.WARDEN
-        archetype_css = self.get_staticroot_article_archetype_css(
-            archetype_int
-        )
+            global_css_path = self.get_page_path(filetype=awk.CSS, page="global")
+            header_css_path = self.get_page_path(filetype=awk.CSS, page="ws_header")
+            footer_css_path = self.get_page_path(filetype=awk.CSS, page="ws_footer")
+            archetype_css_path = self.get_page_path(
+                app=awk.ARTICLES, filetype=awk.CSS, page="warden")
 
-        final_html = skeleton_html
-        #check if the requested path exists
-        article_html_path = get_static_root() \
-                            + self.request.path \
-                            + ".html"
-
-        article_var_bg_image = get_static_url() \
-                               + "/articles/img/" \
-                               + self.request.path.split("/")[-1] \
-                               + ".jpg"
-
-        if os.path.exists(article_html_path):
-            article_html = open(article_html_path,"r").read().rstrip()
-            article_html_body = re.compile("<body>(.+?)</body>",re.DOTALL).\
-                search(article_html).group(1)
-
-            article_template = self.get_staticroot_article_response_html()
-
-            mature_article_html = article_template.replace(
-                "ARTICLE_VAR_CONTENT",
-                article_html_body
+            mature_article_css = self.get_mature_article_css(
+                url_string=url_string, article_obj=article_obj
             )
 
-            mature_article_css = "\n".join([
-                global_css,
-                article_css.replace(
-                    "ARTICLE_VAR_BG_IMAGE",
-                    article_var_bg_image
-                ),
-                header_css,
-                footer_css,
-                archetype_css
-            ])
+            all_css_L = self.get_file_contents_for_list(
+                [global_css_path, header_css_path, footer_css_path,
+                archetype_css_path]
+            )
+            all_css_L.append(mature_article_css)
 
-            implementation_L = [
-                ["AWVAR_TITLE","The Blood of the World"],
-                ["AWVAR_CSS",mature_article_css],
-                ["AWVAR_ANGULARJS",self.get_staticurl_angular_js_min()],
-                ["AWVAR_HTML_HEADER",header_html],
-                ["AWVAR_HTML_BODY",mature_article_html],
-                ["AWVAR_HTML_FOOTER",footer_html]
-            ]
-            for imp in implementation_L:
-                final_html = self.implement_html(final_html,imp[0],imp[1])
-        else:
-            final_html = "Sorry, that article could not be found."
+            mature_article_html = self.get_mature_article_html(
+                url_string=url_string, article_obj=article_obj
+            )
+            all_body_html_L = [mature_article_html]
 
-        return HttpResponse(final_html)
+            implemented_html = self.stitch_and_get_page(
+                title=title, all_css_L=all_css_L,
+                all_body_html_L=all_body_html_L
+            )
+
+        return HttpResponse(implemented_html)

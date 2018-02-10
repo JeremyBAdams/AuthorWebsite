@@ -1,9 +1,12 @@
 class ClientTracker:
 
-    def __init__(self):
+    def __init__(self, request):
+        self.request = request
         self.PC = 0
         self.TABLET = 1
         self.MOBILE = 2
+
+        self.device_D = self.get_client_device(self.request)
 
     def get_client_device(self,request):
         D = {
@@ -13,7 +16,6 @@ class ClientTracker:
             'touch_capable':request.user_agent.is_touch_capable,
             'bot':request.user_agent.is_bot,
             'device':request.user_agent.device,
-            'device_family':request.user_agent.device_family
         }
         return D
 
