@@ -7,7 +7,6 @@ from applib.response_builder import ResponseBuilder
 from applib.archetype import Archetype
 from applib.author_website_keys import AuthorWebsiteKeys as awk
 
-
 class ArticleResponseBuilder(ResponseBuilder):
 
     def __init__(self,request):

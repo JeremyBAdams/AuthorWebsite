@@ -10,7 +10,6 @@ def index(request):
     response = arb.get_index_response()
     return response
 
-
 def article(request):
     arb = ArticleResponseBuilder(request)
     response = arb.get_article_response()
