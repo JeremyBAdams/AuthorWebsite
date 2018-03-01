@@ -18,5 +18,9 @@ class AuthorWebsiteKeys(object):
     CONTENT = 0
     FRONTEND = 1
 
+    #dependence status
+    PLATFORM_DEPENDENT=0
+    PLATFORM_INDEPENDENT=1
+
     def __init__(self):
         pass

@@ -6,6 +6,15 @@ from applib.author_website_keys import AuthorWebsiteKeys as awk
 
 class ResponseBuilder:
     def __init__(self,request):
+        """
+        instantiate ResponseBuilder class
+
+        Args:
+            request (url): Django url object for page request
+
+        Returns:
+            None -> (instantitates ResponseBuilder class)
+        """
         self.request = request
         self.archetype = Archetype()
         self.client_tracker = ClientTracker(self.request)
@@ -26,6 +35,9 @@ class ResponseBuilder:
                 from
             path_or_url (int): from AuthorWebsiteKeys, indicates whether the
                 returned path will be a filesystem path or a static url
+            frontend_or_content (int): from AuthorWebsiteKeys, indicates
+                whether the requested page is frontend code (HTML,CSS,JS),
+                of website content (story articles, blog posts, etc.)
 
         Returns:
             (string): filesystem or static url path to frontend content
@@ -68,7 +80,8 @@ class ResponseBuilder:
 
     def get_page_path(
         self, app=awk.GLOBAL, filetype=awk.HTML, path_or_url=awk.STATICROOT,
-        frontend_or_content=awk.FRONTEND, page="ws_skeleton"
+        frontend_or_content=awk.FRONTEND,  dependence=awk.PLATFORM_DEPENDENT,
+        page="ws_skeleton"
     ):
         """
         get path to a frontend content page, whether as on the filesystem
@@ -82,6 +95,15 @@ class ResponseBuilder:
                 from
             path_or_url (int): from AuthorWebsiteKeys, indicates whether the
                 returned path will be a filesystem path or a static url
+            frontend_or_content (int): from AuthorWebsiteKeys, indicates whether
+                the requested file is frontend code (HTML,CSS,JS) or website
+                content (articles, blog posts, images, etc.)
+            dependence (int): from AuthorWebsiteKeys, indicates whether the
+                requested file is named based on client device (ie. .pc,
+                .mobile, or .tablet), or if there is only one version of the
+                file across all client device types
+            page (string): title of the page as it sits in its directory
+                (ie. no directory or file format extensions)
 
         Returns:
             (string): full path to a frontend html, css, or js page
@@ -129,14 +151,50 @@ class ResponseBuilder:
         return open(path,"r").read()
 
     def get_file_contents_for_list(self, file_list=None):
+        """
+        gets list of strings, each containing the contents of a single file
+        in the provided file list
+
+        Args:
+            file_list (list)
+                elem (string): path to a file
+
+        Returns:
+            (list)
+                elem (string): contents of the requested file
+        """
         return [self.get_file_contents(f) for f in file_list]
 
     def concatenate_file_content_strings(self, strings_list=None):
+        """
+        concatenates a list of strings from a file list
+
+        Args:
+            strings_list (list)
+                elem (string): contents of a file
+        Returns:
+            (string): concatenated contents of all strings in submitted list
+        """
         return "".join(strings_list)
 
     def stitch_and_get_page(
         self, title=None, all_css_L=None, all_body_html_L=None
     ):
+        """
+        creates a string representing a mature HTML(with CSS and JS) page
+        for use with Django's HttpResponse
+
+        Args:
+            title (string): webpage title
+            all_css_L (list)
+                elem (string): string of CSS code for objects in output page
+            all_body_html_L (list)
+                elem (string): string of HTML for layout of objects in output
+                    page
+        Returns:
+            (string): mature HTML page with associated title, HTML objects, and
+                CSS objects
+        """
         skeleton_path = self.get_page_path()
         skeleton_html = self.get_file_contents(skeleton_path)
         header_path = self.get_page_path(page="ws_header")
@@ -158,6 +216,15 @@ class ResponseBuilder:
         return implemented_html
 
     def get_coming_soon_html(self):
+        """
+        creates a mature page for features that are not yet developed
+
+        Args:
+            None
+
+        Returns:
+            (HttpResponse): coming soon page
+        """
         title = "Coming Soon"
 
         global_css_path = self.get_page_path(filetype=awk.CSS, page="global")

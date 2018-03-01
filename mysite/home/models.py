@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from django.db import models
 from django.utils import timezone
 from django.core.validators import MinLengthValidator
@@ -16,7 +16,11 @@ class Feature(models.Model):
     foreign_reference_number = models.CharField(
         validators=[MinLengthValidator(6)],
         max_length=6,
-        unique=True
+    )
+
+    pub_date = models.DateTimeField(
+        'date published',
+        default=datetime.now
     )
 
     def __str__(self):
