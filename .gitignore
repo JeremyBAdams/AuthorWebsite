@@ -1,5 +1,6 @@
-mysite/master-conf-pointer.txt
 .pytest_cache
+.idea
+mysite/master-conf-pointer.txt
 mysite/applib/__pycache__
 mysite/applib/home/__pycache__
 mysite/applib/about/__pycache__
