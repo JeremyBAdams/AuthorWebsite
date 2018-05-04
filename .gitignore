@@ -25,3 +25,5 @@ mysite/news/migrations/__pycache__
 mysite/connect/__pycache__
 mysite/connect/migrations/__pycache__
 mysite/mysite/__pycache__
+*/__pycache__/*
+venv
