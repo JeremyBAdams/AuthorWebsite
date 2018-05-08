@@ -23,5 +23,10 @@ class Feature(models.Model):
         default=datetime.now
     )
 
+    internal_description = models.CharField(
+        max_length=100,
+        default="no description"
+    )
+
     def __str__(self):
-        return "Feature instance - " + str(self.feature_id)
+        return "Feature instance: " + str(self.feature_id) + " - " + str(self.internal_description)
