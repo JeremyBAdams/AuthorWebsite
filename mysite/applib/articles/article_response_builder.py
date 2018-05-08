@@ -27,6 +27,11 @@ class ArticleResponseBuilder(ResponseBuilder):
             [global_css_path, header_css_path, footer_css_path,
             index_css_path, archetype_css_path]
         )
+        index_js_path = self.get_page_path(
+            app=awk.ARTICLES, filetype=awk.JS, path_or_url=awk.STATICURL,
+            dependence=awk.PLATFORM_INDEPENDENT, page="article_index_functions"
+        )
+        all_js_L = [index_js_path]
 
         index_html_path = self.get_page_path(
             app=awk.ARTICLES, page="article_index"
@@ -35,8 +40,9 @@ class ArticleResponseBuilder(ResponseBuilder):
             file_list=[index_html_path]
         )
 
+        print(index_js_path)
         implemented_html = self.stitch_and_get_page(
-            title=title, all_css_L=all_css_L, all_body_html_L=all_body_html_L
+            title=title, all_css_L=all_css_L, all_body_html_L=all_body_html_L, all_js_L=all_js_L
         )
 
         return HttpResponse(implemented_html)
@@ -52,6 +58,9 @@ class ArticleResponseBuilder(ResponseBuilder):
             app=awk.ARTICLES, filetype = awk.JPG, path_or_url=awk.STATICURL,
             page=url_string, frontend_or_content=awk.CONTENT
         )
+        article_bg_image_path = article_bg_image_path.replace("//", "/")
+        print(article_bg_image_path)
+
         mature_response_css = article_response_css\
             .replace("ARTICLE_VAR_BG_IMAGE",article_bg_image_path)
 
@@ -98,6 +107,7 @@ class ArticleResponseBuilder(ResponseBuilder):
 
         if article_obj:
             title = article_obj.title
+            description = article_obj.description
 
             global_css_path = self.get_page_path(filetype=awk.CSS, page="global")
             header_css_path = self.get_page_path(filetype=awk.CSS, page="ws_header")
@@ -121,7 +131,7 @@ class ArticleResponseBuilder(ResponseBuilder):
             all_body_html_L = [mature_article_html]
 
             implemented_html = self.stitch_and_get_page(
-                title=title, all_css_L=all_css_L,
+                title=title, description=description, all_css_L=all_css_L,
                 all_body_html_L=all_body_html_L
             )
 

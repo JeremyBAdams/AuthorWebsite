@@ -113,15 +113,16 @@ class ResponseBuilder:
             frontend_or_content)
         device_string = ""
 
-        if frontend_or_content == awk.FRONTEND:
-            if self.client_tracker.device_D['pc']:
-                device_string = ".pc"
-            elif self.client_tracker.device_D['mobile']:
-                device_string = ".mobile"
-            elif self.client_tracker.device_D['tablet']:
-                device_string = ".tablet"
-            else:
-                device_string = ".pc"
+        if dependence == awk.PLATFORM_DEPENDENT:
+            if frontend_or_content == awk.FRONTEND:
+                if self.client_tracker.device_D['pc']:
+                    device_string = ".pc"
+                elif self.client_tracker.device_D['mobile']:
+                    device_string = ".mobile"
+                elif self.client_tracker.device_D['tablet']:
+                    device_string = ".tablet"
+                else:
+                    device_string = ".pc"
 
         suffix = ""
         if filetype == awk.HTML:
@@ -178,7 +179,7 @@ class ResponseBuilder:
         return "".join(strings_list)
 
     def stitch_and_get_page(
-        self, title=None, all_css_L=None, all_body_html_L=None
+        self, title="", description="", all_css_L=[], all_body_html_L=[], all_js_L=[]
     ):
         """
         creates a string representing a mature HTML(with CSS and JS) page
@@ -206,9 +207,13 @@ class ResponseBuilder:
         all_html_body_string = \
             self.concatenate_file_content_strings(all_body_html_L)
 
+        all_js_string = "\n".join(['<script src="%s"></script>' % (script.replace("//","/")) for script in all_js_L])
+
         implemented_html = skeleton_html\
             .replace("AWVAR_TITLE",title)\
+            .replace("AWVAR_DESCRIPTION",description)\
             .replace("AWVAR_CSS",all_css_string)\
+            .replace("AWVAR_ALLJS",all_js_string)\
             .replace("AWVAR_HTML_HEADER",header_html)\
             .replace("AWVAR_HTML_BODY",all_html_body_string)\
             .replace("AWVAR_HTML_FOOTER",footer_html)\

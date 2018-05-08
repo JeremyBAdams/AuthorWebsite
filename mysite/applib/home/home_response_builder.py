@@ -26,7 +26,10 @@ class HomeResponseBuilder(ResponseBuilder):
         return home_index_html
 
     def get_index_response(self):
-        title = "The Blood of the World"
+        title = "The Blood of the World - by Jeremy Bruce Adams"
+        description = 'The Blood of the World is an upcoming fantasy series by aspiring author Jeremy Bruce Adams. '\
+                      + '''The first novel, A Warden's Calling, tells the story of Araja, a slave cursed with '''\
+                      + '''the inability to wield magic, yet destined to change the world.'''
 
         global_css_path = self.get_page_path(filetype=awk.CSS, page="global")
         header_css_path = self.get_page_path(filetype=awk.CSS, page="ws_header")
@@ -45,8 +48,15 @@ class HomeResponseBuilder(ResponseBuilder):
         mature_home_index_html = self.get_mature_index_html()
         all_body_html_L = [mature_home_index_html]
 
+        global_js_path = self.get_page_path(filetype=awk.JS, path_or_url=awk.STATICURL,
+                                            dependence=awk.PLATFORM_INDEPENDENT, page="global_functions")
+        home_index_js_path = self.get_page_path(app=awk.HOME, filetype=awk.JS, path_or_url=awk.STATICURL,
+                                           dependence=awk.PLATFORM_INDEPENDENT, page="home_index_functions")
+        all_js_L = [global_js_path, home_index_js_path]
+
         implemented_html = self.stitch_and_get_page(
-            title=title, all_css_L=all_css_L, all_body_html_L=all_body_html_L
+            title=title, description=description, all_css_L=all_css_L, all_body_html_L=all_body_html_L,
+            all_js_L=all_js_L
         )
 
         return HttpResponse(implemented_html)
