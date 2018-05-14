@@ -63,6 +63,10 @@ class ResponseBuilder:
             path += "/home"
         elif app == awk.ARTICLES:
             path += "/articles"
+        elif app == awk.ABOUT:
+            path += "/about"
+        elif app == awk.NEWS:
+            path += "/news"
 
         if frontend_or_content == awk.FRONTEND:
             if filetype == awk.HTML:
