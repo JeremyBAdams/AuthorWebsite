@@ -3,6 +3,8 @@ class AuthorWebsiteKeys(object):
     GLOBAL = 0
     HOME = 1
     ARTICLES = 2
+    ABOUT = 3
+    NEWS = 4
 
     #integer keys for file types
     HTML = 0
