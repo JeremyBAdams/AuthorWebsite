@@ -124,7 +124,7 @@ class ResponseBuilder:
                 elif self.client_tracker.device_D['mobile']:
                     device_string = ".mobile"
                 elif self.client_tracker.device_D['tablet']:
-                    device_string = ".tablet"
+                    device_string = ".mobile"
                 else:
                     device_string = ".pc"
 
@@ -211,7 +211,7 @@ class ResponseBuilder:
         all_html_body_string = \
             self.concatenate_file_content_strings(all_body_html_L)
 
-        all_js_string = "\n".join(['<script src="%s"></script>' % (script.replace("//","/")) for script in all_js_L])
+        all_js_string = "\n".join(['<script type="text/javascript" src="%s"></script>' % (script.replace("//","/")) for script in all_js_L])
 
         implemented_html = skeleton_html\
             .replace("AWVAR_TITLE",title)\

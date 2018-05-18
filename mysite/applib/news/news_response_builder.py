@@ -61,6 +61,10 @@ class NewsResponseBuilder(ResponseBuilder):
         )
 
         #get paths to all js function files
+        global_js_path = self.get_page_path(filetype=awk.JS,
+                                            path_or_url=awk.STATICURL,
+                                            dependence=awk.PLATFORM_INDEPENDENT,
+                                            page="global_functions")
         news_index_independent_js_path = self.get_page_path(
             app=awk.NEWS, filetype=awk.JS, page="news_index_functions",
             dependence=awk.PLATFORM_INDEPENDENT, path_or_url=awk.STATICURL
@@ -71,6 +75,7 @@ class NewsResponseBuilder(ResponseBuilder):
         )
 
         all_js_L = [
+            global_js_path,
             news_index_independent_js_path,
             calendar_js_path
         ]
