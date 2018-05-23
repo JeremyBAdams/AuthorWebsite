@@ -13,45 +13,73 @@ class ArticleResponseBuilder(ResponseBuilder):
         ResponseBuilder.__init__(self,request)
 
     def get_index_response(self):
-        title = "Stories of Blessed Astra"
+        title = "Explore the world of Blessed Astra"
 
         global_css_path = self.get_page_path(filetype=awk.CSS, page="global")
         header_css_path = self.get_page_path(filetype=awk.CSS, page="ws_header")
         footer_css_path = self.get_page_path(filetype=awk.CSS, page="ws_footer")
-        index_css_path = self.get_page_path(
+        index_independent_css_path = self.get_page_path(
+            app=awk.ARTICLES, filetype=awk.CSS, page="index",
+            dependence=awk.PLATFORM_INDEPENDENT
+        )
+        index_dependent_css_path = self.get_page_path(
             app=awk.ARTICLES, filetype=awk.CSS, page="index"
         )
         archetype_css_path = self.get_page_path(
-            app=awk.ARTICLES, filetype=awk.CSS, page="warden")
+            app=awk.ARTICLES, filetype=awk.CSS, page="warden",
+            dependence=awk.PLATFORM_INDEPENDENT
+        )
         all_css_L = self.get_file_contents_for_list(
             [global_css_path, header_css_path, footer_css_path,
-            index_css_path, archetype_css_path]
+            index_independent_css_path, index_dependent_css_path,
+            archetype_css_path]
         )
 
+        index_independent_js_path = self.get_page_path(
+            app=awk.ARTICLES, filetype=awk.JS, path_or_url=awk.STATICURL,
+            dependence=awk.PLATFORM_INDEPENDENT, page="article_index_functions"
+        )
+        index_dependent_js_path = self.get_page_path(
+            app=awk.ARTICLES, filetype=awk.JS, path_or_url=awk.STATICURL,
+            page="article_index_functions"
+        )
+        all_js_L = [index_independent_js_path, index_dependent_js_path]
+
         index_html_path = self.get_page_path(
-            app=awk.ARTICLES, page="article_index"
+            app=awk.ARTICLES, page="article_index",
+            dependence=awk.PLATFORM_INDEPENDENT
         )
         all_body_html_L = self.get_file_contents_for_list(
             file_list=[index_html_path]
         )
 
         implemented_html = self.stitch_and_get_page(
-            title=title, all_css_L=all_css_L, all_body_html_L=all_body_html_L
+            title=title, all_css_L=all_css_L, all_body_html_L=all_body_html_L, all_js_L=all_js_L
         )
 
         return HttpResponse(implemented_html)
 
     def get_mature_article_css(self, url_string=None, article_obj=None):
-        article_response_css_path = self.get_page_path(
+        article_response_independent_css_path = self.get_page_path(
+            app=awk.ARTICLES, filetype=awk.CSS, page="response",
+            dependence=awk.PLATFORM_INDEPENDENT
+        )
+        article_response_dependent_css_path = self.get_page_path(
             app=awk.ARTICLES, filetype=awk.CSS, page="response"
         )
-        article_response_css = self.get_file_contents(
-            article_response_css_path
+
+        article_response_css_L = self.get_file_contents_for_list(
+            file_list=[article_response_independent_css_path,
+                       article_response_dependent_css_path]
         )
+        article_response_css = "\n".join(article_response_css_L)
+
         article_bg_image_path = self.get_page_path(
             app=awk.ARTICLES, filetype = awk.JPG, path_or_url=awk.STATICURL,
             page=url_string, frontend_or_content=awk.CONTENT
         )
+        article_bg_image_path = article_bg_image_path.replace("//", "/")
+
         mature_response_css = article_response_css\
             .replace("ARTICLE_VAR_BG_IMAGE",article_bg_image_path)
 
@@ -69,7 +97,8 @@ class ArticleResponseBuilder(ResponseBuilder):
         series_name = series_obj.series_name
 
         article_skeleton_path = self.get_page_path(
-            app=awk.ARTICLES, page="article_response"
+            app=awk.ARTICLES, page="article_response",
+            dependence=awk.PLATFORM_INDEPENDENT
         )
         article_skeleton_html = self.get_file_contents(
             path=article_skeleton_path
@@ -98,12 +127,15 @@ class ArticleResponseBuilder(ResponseBuilder):
 
         if article_obj:
             title = article_obj.title
+            description = article_obj.description
 
             global_css_path = self.get_page_path(filetype=awk.CSS, page="global")
             header_css_path = self.get_page_path(filetype=awk.CSS, page="ws_header")
             footer_css_path = self.get_page_path(filetype=awk.CSS, page="ws_footer")
-            archetype_css_path = self.get_page_path(
-                app=awk.ARTICLES, filetype=awk.CSS, page="warden")
+            archetype_independent_css_path = self.get_page_path(
+                app=awk.ARTICLES, filetype=awk.CSS, page="warden",
+                dependence=awk.PLATFORM_INDEPENDENT
+            )
 
             mature_article_css = self.get_mature_article_css(
                 url_string=url_string, article_obj=article_obj
@@ -111,7 +143,7 @@ class ArticleResponseBuilder(ResponseBuilder):
 
             all_css_L = self.get_file_contents_for_list(
                 [global_css_path, header_css_path, footer_css_path,
-                archetype_css_path]
+                archetype_independent_css_path]
             )
             all_css_L.append(mature_article_css)
 
@@ -121,7 +153,7 @@ class ArticleResponseBuilder(ResponseBuilder):
             all_body_html_L = [mature_article_html]
 
             implemented_html = self.stitch_and_get_page(
-                title=title, all_css_L=all_css_L,
+                title=title, description=description, all_css_L=all_css_L,
                 all_body_html_L=all_body_html_L
             )
 

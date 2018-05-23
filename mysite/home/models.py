@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from django.db import models
 from django.utils import timezone
 from django.core.validators import MinLengthValidator
@@ -16,8 +16,17 @@ class Feature(models.Model):
     foreign_reference_number = models.CharField(
         validators=[MinLengthValidator(6)],
         max_length=6,
-        unique=True
+    )
+
+    pub_date = models.DateTimeField(
+        'date published',
+        default=datetime.now
+    )
+
+    internal_description = models.CharField(
+        max_length=100,
+        default="no description"
     )
 
     def __str__(self):
-        return "Feature instance - " + str(self.feature_id)
+        return "Feature instance: " + str(self.feature_id) + " - " + str(self.internal_description)

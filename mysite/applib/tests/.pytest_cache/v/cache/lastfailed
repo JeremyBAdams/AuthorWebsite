@@ -1,6 +1,0 @@
-{
-  "test_another_file.py::test_another_function": true,
-  "test_another_file.py::test_answer": true,
-  "test_article_response_builder.py::test_answer": true,
-  "test_sample.py::test_answer": true
-}

@@ -72,6 +72,12 @@ class Article(models.Model):
         unique=True
     )
 
+    #description: description of the article, to be used with the "meta:description" html tag
+    description = models.CharField(
+        max_length=500,
+        default="no description"
+    )
+
     url_string = models.CharField(
         max_length=500,
         unique=True
